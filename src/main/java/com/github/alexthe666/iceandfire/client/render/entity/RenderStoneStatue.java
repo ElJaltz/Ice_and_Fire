@@ -32,6 +32,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
 public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
 
@@ -53,6 +56,35 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
     protected void preRenderCallback(EntityStoneStatue entity, PoseStack matrixStackIn, float partialTickTime) {
         float scale = entity.getScale() < 0.01F ? 1F : entity.getScale();
         matrixStackIn.scale(scale, scale, scale);
+    }
+
+    private void applyRendererScale(@NotNull EntityStoneStatue statue, Entity fakeEntity, PoseStack poseStack, float partialTicks) {
+        if (fakeEntity == null) return;
+        try {
+            EntityRenderer<? super Entity> trappedRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(fakeEntity);
+            if (trappedRenderer == null) return;
+            Class<?> cls = trappedRenderer.getClass();
+            Method scaleMethod = null;
+            while (cls != null && scaleMethod == null) {
+                for (Method m : cls.getDeclaredMethods()) {
+                    if (m.getName().equals("scale")) {
+                        Class<?>[] params = m.getParameterTypes();
+                        if (params.length == 3 && PoseStack.class.isAssignableFrom(params[1]) && params[2] == float.class) {
+                            if (params[0].isInstance(fakeEntity) || params[0].isAssignableFrom(fakeEntity.getClass())) {
+                                scaleMethod = m;
+                                break;
+                            }
+                        }
+                    }
+                }
+                cls = cls.getSuperclass();
+            }
+            if (scaleMethod != null) {
+                scaleMethod.setAccessible(true);
+                scaleMethod.invoke(trappedRenderer, fakeEntity, poseStack, partialTicks);
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -122,6 +154,9 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
         } else if (fakeEntity != null) {
             model.setupAnim(fakeEntity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F);
         }
+        if (fakeEntity != null) {
+            applyRendererScale(entityIn, fakeEntity, matrixStackIn, partialTicks);
+        }
         preRenderCallback(entityIn, matrixStackIn, partialTicks);
         matrixStackIn.translate(0, 1.5F, 0);
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
@@ -133,6 +168,10 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             }
         } else {
             model.renderToBuffer(matrixStackIn, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            // Render the trapped entity's layers (e.g., Enderman eyes, drowned outer layer)
+            if (fakeEntity != null) {
+                renderTrappedLayers(fakeEntity, matrixStackIn, bufferIn, packedLightIn, partialTicks);
+            }
         }
 
         matrixStackIn.popPose();
@@ -143,6 +182,9 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             VertexConsumer ivertexbuilder2 = bufferIn.getBuffer(crackTex);
             matrixStackIn.pushPose();
             matrixStackIn.pushPose();
+            if (fakeEntity != null) {
+                applyRendererScale(entityIn, fakeEntity, matrixStackIn, partialTicks);
+            }
             preRenderCallback(entityIn, matrixStackIn, partialTicks);
             matrixStackIn.translate(0, 1.5F, 0);
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
@@ -156,5 +198,54 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             matrixStackIn.popPose();
         }
         //super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+    }
+
+    private void renderTrappedLayers(Entity fakeEntity, PoseStack poseStack, MultiBufferSource buffer, int packedLight, float partialTicks) {
+        try {
+            EntityRenderer<? super Entity> trappedRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(fakeEntity);
+            if (!(trappedRenderer instanceof RenderLayerParent)) return;
+            // Access protected 'layers' list from LivingEntityRenderer/RenderLayerParent via reflection
+            Class<?> cls = trappedRenderer.getClass();
+            Field layersField = null;
+            while (cls != null && layersField == null) {
+                try {
+                    layersField = cls.getDeclaredField("layers");
+                } catch (NoSuchFieldException ignored) {
+                    cls = cls.getSuperclass();
+                }
+            }
+            if (layersField == null) return;
+            layersField.setAccessible(true);
+            Object layersObj = layersField.get(trappedRenderer);
+            if (!(layersObj instanceof List<?> layers)) return;
+
+            float limbSwing = 0.0F;
+            float limbSwingAmount = 0.0F;
+            float ageInTicks = fakeEntity.tickCount + partialTicks;
+            float netHeadYaw = 0.0F;
+            float headPitch = 0.0F;
+
+            for (Object layer : layers) {
+                Method renderMethod = null;
+                Class<?> layerCls = layer.getClass();
+                // Find a 'render' method matching (PoseStack, MultiBufferSource, int, Entity, float, float, float, float, float, float)
+                for (Method m : layerCls.getMethods()) {
+                    if (m.getName().equals("render")) {
+                        Class<?>[] p = m.getParameterTypes();
+                        if (p.length == 10 && PoseStack.class.isAssignableFrom(p[0]) && MultiBufferSource.class.isAssignableFrom(p[1]) && p[2] == int.class && Entity.class.isAssignableFrom(p[3])) {
+                            renderMethod = m;
+                            break;
+                        }
+                    }
+                }
+                if (renderMethod != null) {
+                    try {
+                        renderMethod.invoke(layer, poseStack, buffer, packedLight, fakeEntity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 }
