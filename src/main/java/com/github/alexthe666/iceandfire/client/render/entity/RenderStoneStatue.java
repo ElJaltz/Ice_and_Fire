@@ -28,6 +28,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.AgeableMob;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -146,7 +148,16 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
         matrixStackIn.pushPose();
         float yaw = entityIn.yRotO + (entityIn.getYRot() - entityIn.yRotO) * partialTicks;
         boolean shouldSit = entityIn.isPassenger() && (entityIn.getVehicle() != null && entityIn.getVehicle().shouldRiderSit());
-        model.young = entityIn.isBaby();
+        // Use persisted baby flag from statue to decide young scaling
+        boolean trappedIsBaby = entityIn.isTrappedBaby();
+        model.young = trappedIsBaby;
+        // Optionally align fakeEntity baby state for layers that depend on it
+        if (fakeEntity instanceof AgeableMob ageable) {
+            try {
+                ageable.setAge(trappedIsBaby ? -24000 : 0);
+            } catch (Throwable ignored) {
+            }
+        }
         model.riding = shouldSit;
         model.attackTime = entityIn.getAttackAnim(partialTicks);
         if (model instanceof AdvancedEntityModel) {

@@ -32,6 +32,7 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
     private static final EntityDataAccessor<Float> TRAPPED_ENTITY_HEIGHT = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> TRAPPED_ENTITY_SCALE = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> CRACK_AMOUNT = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> TRAPPED_IS_BABY = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.BOOLEAN);
     private EntityDimensions stoneStatueSize = EntityDimensions.fixed(0.5F, 0.5F);
     private boolean playedBreakEffect = false;
 
@@ -66,6 +67,12 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
         statue.setTrappedEntityWidth(parent.getBbWidth());
         statue.setTrappedHeight(parent.getBbHeight());
         statue.setTrappedScale(parent.getScale());
+        // Persist if the original entity was a baby/young for correct model scaling later
+        try {
+            statue.setTrappedBaby(parent.isBaby());
+        } catch (Throwable ignored) {
+            statue.setTrappedBaby(false);
+        }
 
         return statue;
     }
@@ -120,6 +127,7 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
         this.entityData.define(TRAPPED_ENTITY_HEIGHT, 0.5F);
         this.entityData.define(TRAPPED_ENTITY_SCALE, 1F);
         this.entityData.define(CRACK_AMOUNT, 0);
+        this.entityData.define(TRAPPED_IS_BABY, Boolean.FALSE);
     }
 
     public EntityType getTrappedEntityType() {
@@ -163,6 +171,14 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
         return this.entityData.get(TRAPPED_ENTITY_SCALE);
     }
 
+    public boolean isTrappedBaby() {
+        return this.entityData.get(TRAPPED_IS_BABY);
+    }
+
+    public void setTrappedBaby(boolean baby) {
+        this.entityData.set(TRAPPED_IS_BABY, baby);
+    }
+
     public void setTrappedScale(float size) {
         this.entityData.set(TRAPPED_ENTITY_SCALE, size);
     }
@@ -176,6 +192,7 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
         tag.putFloat("StatueScale", this.getTrappedScale());
         tag.putString("StatueEntityType", this.getTrappedEntityTypeString());
         tag.put("StatueEntityTag", this.getTrappedTag());
+        tag.putBoolean("StatueIsBaby", this.isTrappedBaby());
     }
 
     @Override
@@ -194,6 +211,9 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
         if (tag.contains("StatueEntityTag")) {
             this.setTrappedTag(tag.getCompound("StatueEntityTag"));
 
+        }
+        if (tag.contains("StatueIsBaby")) {
+            this.setTrappedBaby(tag.getBoolean("StatueIsBaby"));
         }
     }
 
