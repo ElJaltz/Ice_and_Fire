@@ -13,6 +13,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +28,7 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
     private static final EntityDataAccessor<Float> TRAPPED_ENTITY_SCALE = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> CRACK_AMOUNT = SynchedEntityData.defineId(EntityStoneStatue.class, EntityDataSerializers.INT);
     private EntityDimensions stoneStatueSize = EntityDimensions.fixed(0.5F, 0.5F);
+    private boolean playedBreakEffect = false;
 
     public EntityStoneStatue(EntityType<? extends LivingEntity> t, Level worldIn) {
         super(t, worldIn);
@@ -216,7 +220,24 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
 
     @Override
     public void kill() {
-        this.remove(RemovalReason.KILLED);
+        this.playBreakEffect();
+        super.remove(RemovalReason.KILLED);
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED) {
+            this.playBreakEffect();
+        }
+        super.remove(reason);
+    }
+
+    private void playBreakEffect() {
+        if (!this.level().isClientSide && !this.playedBreakEffect) {
+            BlockState state = Blocks.STONE.defaultBlockState();
+            this.level().levelEvent(null, 2001, this.blockPosition(), Block.getId(state));
+            this.playedBreakEffect = true;
+        }
     }
 
     @Override
