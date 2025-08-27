@@ -90,6 +90,20 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             fakeEntity = this.hollowEntityMap.get(entityIn.getTrappedEntityTypeString());
         }
         RenderType tex = IafRenderType.getStoneMobRenderType(200, 200);
+        // Use trapped entity's own texture for non-player entities when available
+        if (fakeEntity != null && entityIn.getTrappedEntityType() != EntityType.PLAYER) {
+            try {
+                EntityRenderer<? super Entity> trappedRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(fakeEntity);
+                if (trappedRenderer != null) {
+                    ResourceLocation textureRL = trappedRenderer.getTextureLocation(fakeEntity);
+                    if (textureRL != null) {
+                        tex = model.renderType(textureRL);
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        // Keep troll special-case stone texture override
         if (fakeEntity instanceof EntityTroll) {
             tex = RenderType.entityCutout(((EntityTroll) fakeEntity).getTrollType().TEXTURE_STONE);
         }
