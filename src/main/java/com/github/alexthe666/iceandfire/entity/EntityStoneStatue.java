@@ -250,9 +250,10 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
             double cy = (box.minY + box.maxY) * 0.5D;
             double cz = (box.minZ + box.maxZ) * 0.5D;
 
-            // Particle count based on surface area; clamp to avoid extremes
+            // Particle count proportional to surface area; normalized to a 1x2x1 box (area=10)
             double area = 2.0D * (w * h + w * d + h * d);
-            int count = Mth.clamp((int) Math.round(area * 40.0D), 20, 400);
+            double baselineArea = 10.0D; // 2*(1*2 + 1*1 + 2*1)
+            int count = Mth.clamp((int) Math.round(30.0D * (area / baselineArea)), 4, 200);
 
             if (this.level() instanceof ServerLevel server) {
                 BlockParticleOption particle = new BlockParticleOption(ParticleTypes.BLOCK, state);
