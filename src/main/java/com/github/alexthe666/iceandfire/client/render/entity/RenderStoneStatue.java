@@ -55,8 +55,13 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 
-    protected void preRenderCallback(EntityStoneStatue entity, PoseStack matrixStackIn, float partialTickTime) {
+    protected void preRenderCallback(EntityStoneStatue entity, Entity fakeEntity, PoseStack matrixStackIn, float partialTickTime) {
         float scale = entity.getScale() < 0.01F ? 1F : entity.getScale();
+        // If the trapped entity is a baby and its renderer will apply a 0.5x baby scale,
+        // neutralize duplicate scaling by dividing out the baby factor from the statue scale
+        if (entity.isTrappedBaby() && fakeEntity instanceof AgeableMob) {
+            scale /= 0.5F;
+        }
         matrixStackIn.scale(scale, scale, scale);
     }
 
@@ -168,7 +173,7 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
         if (fakeEntity != null) {
             applyRendererScale(entityIn, fakeEntity, matrixStackIn, partialTicks);
         }
-        preRenderCallback(entityIn, matrixStackIn, partialTicks);
+        preRenderCallback(entityIn, fakeEntity, matrixStackIn, partialTicks);
         matrixStackIn.translate(0, 1.5F, 0);
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(yaw));
@@ -196,7 +201,7 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             if (fakeEntity != null) {
                 applyRendererScale(entityIn, fakeEntity, matrixStackIn, partialTicks);
             }
-            preRenderCallback(entityIn, matrixStackIn, partialTicks);
+            preRenderCallback(entityIn, fakeEntity, matrixStackIn, partialTicks);
             matrixStackIn.translate(0, 1.5F, 0);
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(yaw));
