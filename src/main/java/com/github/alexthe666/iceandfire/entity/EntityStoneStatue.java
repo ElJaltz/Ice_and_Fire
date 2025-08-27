@@ -28,6 +28,8 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
 
     public EntityStoneStatue(EntityType<? extends LivingEntity> t, Level worldIn) {
         super(t, worldIn);
+        // Make this entity behave as a solid collision obstacle similar to Shulker/Boat
+      //  this.setBlocksBuilding(true);
     }
 
     public static AttributeSupplier.Builder bakeAttributes() {
@@ -36,6 +38,8 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
             .add(Attributes.MAX_HEALTH, 20)
             //SPEED
             .add(Attributes.MOVEMENT_SPEED, 0.0D)
+            //KNOCKBACK
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
             //ATTACK
             .add(Attributes.ATTACK_DAMAGE, 1.0D);
     }
@@ -61,6 +65,38 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
 
     @Override
     public void push(@NotNull Entity entityIn) {
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        // Allow entities/players to collide and stand on this statue
+        return true;
+    }
+
+    @Override
+    public boolean isPickable() {
+        // Allow ray picking/selection if needed
+        return true;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
+
+    @Override
+    public void push(double x, double y, double z) {
+        // Prevent external motion application
+    }
+
+    @Override
+    public void knockback(double strength, double x, double z) {
+        // Ignore knockback from attacks/explosions
     }
 
     @Override
