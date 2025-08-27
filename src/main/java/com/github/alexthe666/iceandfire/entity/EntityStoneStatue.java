@@ -16,6 +16,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +37,6 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
 
     public EntityStoneStatue(EntityType<? extends LivingEntity> t, Level worldIn) {
         super(t, worldIn);
-        // Make this entity behave as a solid collision obstacle similar to Shulker/Boat
-      //  this.setBlocksBuilding(true);
     }
 
     public static AttributeSupplier.Builder bakeAttributes() {
@@ -235,7 +238,28 @@ public class EntityStoneStatue extends LivingEntity implements IBlacklistedFromS
     private void playBreakEffect() {
         if (!this.level().isClientSide && !this.playedBreakEffect) {
             BlockState state = Blocks.STONE.defaultBlockState();
+            // Vanilla block break event (plays sound and central particles)
             this.level().levelEvent(null, 2001, this.blockPosition(), Block.getId(state));
+
+            // Scale particle area to the statue's hitbox
+            AABB box = this.getBoundingBox();
+            double w = box.getXsize();
+            double h = box.getYsize();
+            double d = box.getZsize();
+            double cx = (box.minX + box.maxX) * 0.5D;
+            double cy = (box.minY + box.maxY) * 0.5D;
+            double cz = (box.minZ + box.maxZ) * 0.5D;
+
+            // Particle count based on surface area; clamp to avoid extremes
+            double area = 2.0D * (w * h + w * d + h * d);
+            int count = Mth.clamp((int) Math.round(area * 40.0D), 20, 400);
+
+            if (this.level() instanceof ServerLevel server) {
+                BlockParticleOption particle = new BlockParticleOption(ParticleTypes.BLOCK, state);
+                // Spread across the full hitbox for a proper distributed effect
+                server.sendParticles(particle, cx, cy, cz, count, w * 0.5D, h * 0.5D, d * 0.5D, 0.15D);
+            }
+
             this.playedBreakEffect = true;
         }
     }
