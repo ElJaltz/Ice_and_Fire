@@ -196,10 +196,34 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             int i = Mth.clamp(entityIn.getCrackAmount() - 1, 0, DESTROY_STAGES.length - 1);
             RenderType crackTex = IafRenderType.getStoneCrackRenderType(DESTROY_STAGES[i]);
             VertexConsumer baseBuilder = bufferIn.getBuffer(crackTex);
-            int[] texSize = getModelTextureSize(model);
-            int targetTexSize = 256;
-            float tileU = texSize[0] > 0 ? (float) targetTexSize / (float) texSize[0] : 1.0F;
-            float tileV = texSize[1] > 0 ? (float) targetTexSize / (float) texSize[1] : 1.0F;
+            int crackW = 16, crackH = 16;
+            try {
+                int[] csz = getTextureSize(DESTROY_STAGES[i]);
+                crackW = csz[0];
+                crackH = csz[1];
+            } catch (Throwable ignored) {
+            }
+            int trapW = 64, trapH = 64;
+            if (fakeEntity != null) {
+                try {
+                    EntityRenderer<? super Entity> trappedRenderer2 = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(fakeEntity);
+                    if (trappedRenderer2 != null) {
+                        ResourceLocation trappedRL = trappedRenderer2.getTextureLocation(fakeEntity);
+                        if (trappedRL != null) {
+                            int[] tsz = getTextureSize(trappedRL);
+                            trapW = tsz[0];
+                            trapH = tsz[1];
+                        }
+                    }
+                } catch (Throwable ignored) {
+                }
+            } else {
+                int[] modelSize = getModelTextureSize(model);
+                trapW = modelSize[0];
+                trapH = modelSize[1];
+            }
+            float tileU = crackW > 0 ? (float) trapW / (float) crackW : 1.0F;
+            float tileV = crackH > 0 ? (float) trapH / (float) crackH : 1.0F;
             VertexConsumer ivertexbuilder2 = new TilingVertexConsumer(baseBuilder, tileU, tileV);
             matrixStackIn.pushPose();
             matrixStackIn.pushPose();
@@ -303,6 +327,33 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             }
         }
         return null;
+    }
+
+    private static final Map<ResourceLocation, int[]> TEX_SIZE_CACHE = new HashMap<>();
+
+    private static int[] getTextureSize(ResourceLocation rl) {
+        int[] cached = TEX_SIZE_CACHE.get(rl);
+        if (cached != null) return cached;
+        int w = 16, h = 16;
+        try {
+            Object optObj = Minecraft.getInstance().getResourceManager().getResource(rl);
+            if (optObj instanceof java.util.Optional) {
+                java.util.Optional opt = (java.util.Optional) optObj;
+                if (opt.isPresent()) {
+                    net.minecraft.server.packs.resources.Resource res = (net.minecraft.server.packs.resources.Resource) opt.get();
+                    try (java.io.InputStream is = res.open()) {
+                        com.mojang.blaze3d.platform.NativeImage img = com.mojang.blaze3d.platform.NativeImage.read(is);
+                        w = img.getWidth();
+                        h = img.getHeight();
+                        img.close();
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        int[] size = new int[]{w, h};
+        TEX_SIZE_CACHE.put(rl, size);
+        return size;
     }
 
     private static class TilingVertexConsumer implements VertexConsumer {
