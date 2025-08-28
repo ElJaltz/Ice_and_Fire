@@ -195,7 +195,12 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
         if (entityIn.getCrackAmount() >= 1) {
             int i = Mth.clamp(entityIn.getCrackAmount() - 1, 0, DESTROY_STAGES.length - 1);
             RenderType crackTex = IafRenderType.getStoneCrackRenderType(DESTROY_STAGES[i]);
-            VertexConsumer ivertexbuilder2 = bufferIn.getBuffer(crackTex);
+            VertexConsumer baseBuilder = bufferIn.getBuffer(crackTex);
+            int[] texSize = getModelTextureSize(model);
+            int targetTexSize = 256;
+            float tileU = texSize[0] > 0 ? (float) targetTexSize / (float) texSize[0] : 1.0F;
+            float tileV = texSize[1] > 0 ? (float) targetTexSize / (float) texSize[1] : 1.0F;
+            VertexConsumer ivertexbuilder2 = new TilingVertexConsumer(baseBuilder, tileU, tileV);
             matrixStackIn.pushPose();
             matrixStackIn.pushPose();
             if (fakeEntity != null) {
@@ -262,6 +267,103 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
                 }
             }
         } catch (Throwable ignored) {
+        }
+    }
+
+    private static int[] getModelTextureSize(EntityModel model) {
+        int w = 64;
+        int h = 64;
+        try {
+            Field fw = findFieldInHierarchy(model.getClass(), "texWidth");
+            Field fh = findFieldInHierarchy(model.getClass(), "texHeight");
+            if (fw != null) {
+                fw.setAccessible(true);
+                Object val = fw.get(model);
+                if (val instanceof Integer) w = (Integer) val;
+            }
+            if (fh != null) {
+                fh.setAccessible(true);
+                Object val = fh.get(model);
+                if (val instanceof Integer) h = (Integer) val;
+            }
+        } catch (Throwable ignored) {
+        }
+        if (w <= 0) w = 64;
+        if (h <= 0) h = 64;
+        return new int[]{w, h};
+    }
+
+    private static Field findFieldInHierarchy(Class<?> cls, String name) {
+        Class<?> c = cls;
+        while (c != null) {
+            try {
+                return c.getDeclaredField(name);
+            } catch (NoSuchFieldException e) {
+                c = c.getSuperclass();
+            }
+        }
+        return null;
+    }
+
+    private static class TilingVertexConsumer implements VertexConsumer {
+        private final VertexConsumer delegate;
+        private final float uMul, vMul;
+
+        private TilingVertexConsumer(VertexConsumer delegate, float uMul, float vMul) {
+            this.delegate = delegate;
+            this.uMul = uMul;
+            this.vMul = vMul;
+        }
+
+        @Override
+        public VertexConsumer vertex(double x, double y, double z) {
+            delegate.vertex(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer color(int r, int g, int b, int a) {
+            delegate.color(r, g, b, a);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer uv(float u, float v) {
+            delegate.uv(u * uMul, v * vMul);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer overlayCoords(int u, int v) {
+            delegate.overlayCoords(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer uv2(int u, int v) {
+            delegate.uv2(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer normal(float x, float y, float z) {
+            delegate.normal(x, y, z);
+            return this;
+        }
+
+        @Override
+        public void endVertex() {
+            delegate.endVertex();
+        }
+
+        @Override
+        public void defaultColor(int r, int g, int b, int a) {
+            delegate.defaultColor(r, g, b, a);
+        }
+
+        @Override
+        public void unsetDefaultColor() {
+            delegate.unsetDefaultColor();
         }
     }
 }
