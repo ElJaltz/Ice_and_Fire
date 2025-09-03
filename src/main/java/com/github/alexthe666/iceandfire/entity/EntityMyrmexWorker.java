@@ -192,7 +192,7 @@ public class EntityMyrmexWorker extends EntityMyrmexBase {
 
     @Override
     public float getModelScale() {
-        return 0.6F;
+        return 1F;
     }
 
     @Override
@@ -230,8 +230,8 @@ public class EntityMyrmexWorker extends EntityMyrmexBase {
             } else {
                 this.playBiteSound();
             }
-            if (!this.level().isClientSide && this.getRandom().nextInt(3) == 0 && this.getItemInHand(InteractionHand.MAIN_HAND) != ItemStack.EMPTY) {
-                this.spawnAtLocation(this.getItemInHand(InteractionHand.MAIN_HAND), 0);
+            if (!this.level().isClientSide && this.getRandom().nextInt(1) == 0 && this.getItemInHand(InteractionHand.MAIN_HAND) != ItemStack.EMPTY) {
+                this.spawnAtLocation(this.getItemInHand(InteractionHand.MAIN_HAND), 5);
                 this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             }
             if (!this.getPassengers().isEmpty()) {

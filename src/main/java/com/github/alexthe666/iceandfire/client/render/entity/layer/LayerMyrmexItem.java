@@ -47,12 +47,13 @@ public class LayerMyrmexItem extends RenderLayer<EntityMyrmexBase, AdvancedEntit
                 matrixStackIn.pushPose();
                 if (!itemstack.isEmpty()) {
                     matrixStackIn.pushPose();
+                    matrixStackIn.scale(0.5F, 0.5F, 0.5F);
 
                     if (entitylivingbaseIn.isShiftKeyDown()) {
                         matrixStackIn.translate(0.0F, 0.2F, 0.0F);
                     }
                     this.translateToHand(HumanoidArm.RIGHT, matrixStackIn);
-                    matrixStackIn.translate(0F, 0.3F, -1.6F);
+                    matrixStackIn.translate(0F, 1.8F, -2.6F);
                     if (itemstack.getItem() instanceof BlockItem) {
                         matrixStackIn.translate(0F, 0, 0.2F);
                     } else {
