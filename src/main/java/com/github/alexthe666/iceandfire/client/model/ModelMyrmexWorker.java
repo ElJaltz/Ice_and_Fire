@@ -43,37 +43,38 @@ public class ModelMyrmexWorker extends ModelMyrmexBase {
         Torso.setTextureOffset(8, 46).addBox(-1.0F, 1.0F, 6.0F, 2.0F, 2.0F, 1.0F, 0.0F, false);
 
         R_leg_1 = new AdvancedModelBox(this);
-        R_leg_1.setRotationPoint(2.0F, 0.0F, 1.0F);
-        R_leg_1.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
-        setRotateAngle(R_leg_1, 0.0F, -0.523599F, 0.0F);
+        R_leg_1.setRotationPoint(-2.0F, 0.0F, 0.0F);
+        R_leg_1.setTextureOffset(36, 31).addBox(-8.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
         Torso.addChild(R_leg_1);
 
         R_leg_2 = new AdvancedModelBox(this);
-        R_leg_2.setRotationPoint(2.0F, 0.0F, 1.0F);
-        R_leg_2.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
+        R_leg_2.setRotationPoint(-2.0F, 0.0F, 3.0F);
+        R_leg_2.setTextureOffset(36, 31).addBox(-8.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
         Torso.addChild(R_leg_2);
+        setRotateAngle(R_leg_2, 0.0F, 0.523599F, 0.0F);
+
 
         R_leg_3 = new AdvancedModelBox(this);
-        R_leg_3.setRotationPoint(2.0F, 0.0F, 1.0F);
-        R_leg_3.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
-        setRotateAngle(R_leg_3, 0.0F, 0.523599F, 0.0F);
+        R_leg_3.setRotationPoint(-2.0F, 0.0F, -3.0F);
+        R_leg_3.setTextureOffset(36, 31).addBox(-8.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
+        setRotateAngle(R_leg_3, 0.0F, -0.523599F, 0.0F);
         Torso.addChild(R_leg_3);
 
 
         L_leg_1 = new AdvancedModelBox(this);
-        L_leg_1.setRotationPoint(2.0F, 0.0F, 1.0F);
-        L_leg_1.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
-        setRotateAngle(L_leg_1, 0.0F, -0.523599F, 0.0F);
+        L_leg_1.setRotationPoint(2.0F, 0.0F, 0.0F);
+        L_leg_1.setTextureOffset(36, 31).addBox(0.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, true);
         Torso.addChild(L_leg_1);
 
         L_leg_2 = new AdvancedModelBox(this);
-        L_leg_2.setRotationPoint(2.0F, 0.0F, 1.0F);
-        L_leg_2.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
+        L_leg_2.setRotationPoint(2.0F, 0.0F, 3.0F);
+        L_leg_2.setTextureOffset(36, 31).addBox(0.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, true);
+        setRotateAngle(L_leg_2, 0.0F, -0.523599F, 0.0F);
         Torso.addChild(L_leg_2);
 
         L_leg_3 = new AdvancedModelBox(this);
-        L_leg_3.setRotationPoint(2.0F, 0.0F, 1.0F);
-        L_leg_3.setTextureOffset(36, 31).addBox(-2.0F, 0.0F, -1.0F, 8.0F, 8.0F, 0.0F, 0.0F, false);
+        L_leg_3.setRotationPoint(2.0F, 0.0F, -3.0F);
+        L_leg_3.setTextureOffset(36, 31).addBox(0.0F, -2.0F, 0.0F, 8.0F, 8.0F, 0.0F, 0.0F, true);
         setRotateAngle(L_leg_3, 0.0F, 0.523599F, 0.0F);
         Torso.addChild(L_leg_3);
 
@@ -84,12 +85,12 @@ public class ModelMyrmexWorker extends ModelMyrmexBase {
         setRotateAngle(Head, 0.436332F, 0.0F, 0.0F);
 
         L_eye = new AdvancedModelBox(this);
-        L_eye.setTextureOffset(36, 39).addBox(3.0F, -2.5F, -5.5F, 1.0F, 3.0F, 5.0F, 0.0F, false);
+        L_eye.setTextureOffset(36, 39).addBox(3.0F, -2.5F, -4.5F, 1.0F, 3.0F, 5.0F, 0.0F, false);
         setRotateAngle(L_eye, 0.2181662F, 0.0F, 0.0F);
         Head.addChild(L_eye);
 
         R_eye = new AdvancedModelBox(this);
-        R_eye.setTextureOffset(36, 39).addBox(-4.0F, -2.5F, -5.5F, 1.0F, 3.0F, 5.0F, 0.0F, false);
+        R_eye.setTextureOffset(36, 39).addBox(-4.0F, -2.5F, -4.5F, 1.0F, 3.0F, 5.0F, 0.0F, false);
         setRotateAngle(R_eye, 0.2181662F, 0.0F, 0.0F);
         Head.addChild(R_eye);
 
@@ -104,15 +105,15 @@ public class ModelMyrmexWorker extends ModelMyrmexBase {
         Head.addChild(R_Antenna);
 
         R_jaw = new AdvancedModelBox(this);
-        R_jaw.setRotationPoint(3.0F, 0.0F, -10.0F);
-        R_jaw.setTextureOffset(16, 43).addBox(0.0F, 0.0F, 0.0F, 1.0F, 2.0F, 3.0F, 0.0F, false);
-        R_jaw.setTextureOffset(0, 46).addBox(-2.0F, 0.0F, 0.0F, 2.0F, 2.0F, 2.0F, 0.0F, true);
+        R_jaw.setRotationPoint(3.0F, 0.0F, -8.0F);
+        R_jaw.setTextureOffset(16, 43).addBox(0.0F, 0.0F, -2.0F, 1.0F, 2.0F, 3.0F, 0.0F, false);
+        R_jaw.setTextureOffset(0, 46).addBox(-2.0F, 0.0F, -2.0F, 2.0F, 2.0F, 2.0F, 0.0F, true);
         Head.addChild(R_jaw);
 
         L_jaw = new AdvancedModelBox(this);
-        L_jaw.setRotationPoint(-4.0F, 0.0F, -10.0F);
-        L_jaw.setTextureOffset(16, 43).addBox(0.0F, 0.0F, 0.0F, 1.0F, 2.0F, 3.0F, 0.0F, true);
-        L_jaw.setTextureOffset(0, 46).addBox(1.0F, 0.0F, 0.0F, 2.0F, 2.0F, 2.0F, 0.0F, false);
+        L_jaw.setRotationPoint(-4.0F, 0.0F, -8.0F);
+        L_jaw.setTextureOffset(16, 43).addBox(0.0F, 0.0F, -2.0F, 1.0F, 2.0F, 3.0F, 0.0F, true);
+        L_jaw.setTextureOffset(0, 46).addBox(1.0F, 0.0F, -2.0F, 2.0F, 2.0F, 2.0F, 0.0F, false);
         Head.addChild(L_jaw);
 
 
@@ -137,9 +138,35 @@ public class ModelMyrmexWorker extends ModelMyrmexBase {
     }
 
     @Override
-    public void setupAnim(Entity entity, float v, float v1, float v2,  float netHeadYaw, float headPitch) {
-        this.faceTarget(netHeadYaw, headPitch, 2, Head);
+    public void setupAnim(Entity entity, float f, float f1, float f2,  float netHeadYaw, float headPitch) {
+        this.resetToDefaultPose();
+        float degree_idle = 0.25F;
+        float speed_idle = 0.05F;
+        float degree_walk = 0.3F;
+        float speed_walk = 0.9F;
 
+
+        this.faceTarget(netHeadYaw, headPitch, 2, Head);
+        this.swing(R_jaw, speed_idle * 2F, degree_idle *- 0.75F, true, 1, 0.2F, f2, 1);
+        this.swing(L_jaw, speed_idle * 2F, degree_idle *- 0.75F, false, 1, 0.2F, f2, 1);
+        this.swing(Head, speed_idle, degree_idle * -0.15F, false,  0, 0F, f2, 1);
+        this.flap(R_Antenna, speed_idle, degree_idle * 0.2F, false,  0, 0F, f2, 2);
+        this.flap(L_Antenna,speed_idle, degree_idle * 0.2F, true,  0, 0, f2, 2);
+        this.walk(L_leg_1, speed_walk, degree_walk * 0.3F, false, -2F, 0.4F, f, f1);
+        this.walk(L_leg_2, speed_walk, degree_walk * 0.3F, true, -2F, 0.4F, f, f1);
+        this.walk(L_leg_3, speed_walk, degree_walk * 0.3F, false, -2F, 0.4F, f, f1);
+
+        this.walk(R_leg_1, speed_walk, degree_walk * 0.3F, true, -2F, 0.4F, f, f1);
+        this.walk(R_leg_2, speed_walk, degree_walk * 0.3F, false, -2F, 0.4F, f, f1);
+        this.walk(R_leg_3, speed_walk, degree_walk * 0.3F, true, -2F, 0.4F, f, f1);
+
+
+    }
+    private void animateLeg(AdvancedModelBox[] models, float speed, float degree, boolean reverse, float offset, float weight, float f, float f1) {
+        this.flap(models[0], speed, degree * 0.4F, reverse, offset, weight * 0.2F, f, f1);
+        this.flap(models[1], speed, degree * 2, reverse, offset, weight * -0.4F, f, f1);
+        this.flap(models[1], speed, -degree * 1.2F, reverse, offset, weight * 0.5F, f, f1);
+        this.walk(models[0], speed, degree, reverse, offset, 0F, f, f1);
 
     }
 
