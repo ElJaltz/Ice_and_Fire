@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.List;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
 
@@ -44,6 +46,9 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
     private final Map<String, EntityModel> modelMap = new HashMap();
     private final Map<String, Entity> hollowEntityMap = new HashMap();
     private final EntityRendererProvider.Context context;
+    // Client-side rotation tracking per statue entity id
+    private final Map<Integer, Float> rotationOffsets = new HashMap<>();
+    private final Map<Integer, Integer> lastTickUpdated = new HashMap<>();
 
     public RenderStoneStatue(EntityRendererProvider.Context context) {
         super(context);
@@ -92,6 +97,25 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
             }
         } catch (Throwable ignored) {
         }
+    }
+
+    private float getRotationOffset(EntityStoneStatue entity, boolean rotating) {
+        int id = entity.getId();
+        float current = rotationOffsets.getOrDefault(id, 0.0F);
+        int tick = entity.tickCount;
+        Integer last = lastTickUpdated.get(id);
+        if (rotating) {
+            int dt = (last == null) ? 1 : (tick - last);
+            if (dt < 1) dt = 1;
+            float ratePerTick = 4.0F; // degrees per tick for smooth rotation
+            current = (current + ratePerTick * dt) % 360.0F;
+            rotationOffsets.put(id, current);
+            lastTickUpdated.put(id, tick);
+        } else {
+            // keep last tick updated to avoid multiple updates per tick
+            lastTickUpdated.put(id, tick);
+        }
+        return current;
     }
 
     @Override
@@ -151,7 +175,17 @@ public class RenderStoneStatue extends EntityRenderer<EntityStoneStatue> {
 
 
         matrixStackIn.pushPose();
-        float yaw = entityIn.yRotO + (entityIn.getYRot() - entityIn.yRotO) * partialTicks;
+        Minecraft mc = Minecraft.getInstance();
+        boolean rotating = false;
+        if (mc.player != null && (mc.player.isCrouching() || mc.player.isShiftKeyDown()) && mc.options.keyUse.isDown()) {
+            HitResult hr = mc.hitResult;
+            if (hr instanceof EntityHitResult ehr && ehr.getEntity().getId() == entityIn.getId()) {
+                rotating = true;
+            }
+        }
+        float baseYaw = entityIn.yRotO + (entityIn.getYRot() - entityIn.yRotO) * partialTicks;
+        float rotOffset = getRotationOffset(entityIn, rotating);
+        float yaw = baseYaw + rotOffset;
         boolean shouldSit = entityIn.isPassenger() && (entityIn.getVehicle() != null && entityIn.getVehicle().shouldRiderSit());
         // Use persisted baby flag from statue to decide young scaling
         boolean trappedIsBaby = entityIn.isTrappedBaby();
