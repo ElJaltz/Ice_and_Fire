@@ -3,6 +3,10 @@ package com.github.alexthe666.iceandfire.item;
 import com.github.alexthe666.iceandfire.IceAndFire;
 import com.github.alexthe666.iceandfire.enums.EnumBestiaryPages;
 import com.google.common.primitives.Ints;
+import com.github.alexthe666.iceandfire.client.gui.bestiary.BestiaryScreen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.Minecraft;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -53,9 +57,14 @@ public class ItemBestiary extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, @NotNull InteractionHand handIn) {
         ItemStack itemStackIn = playerIn.getItemInHand(handIn);
         if (worldIn.isClientSide) {
-            IceAndFire.PROXY.openBestiaryGui(itemStackIn);
+            openBestiaryClient();
         }
         return new InteractionResultHolder<>(InteractionResult.PASS, itemStackIn);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void openBestiaryClient() {
+        Minecraft.getInstance().setScreen(new BestiaryScreen());
     }
 
     @Override

@@ -1,0 +1,14 @@
+{
+  "title": "bestiary.introduction",
+  "text": "introduction_0.txt",
+  "widgets": [
+    {"type": "IMAGE", "spread": 0, "x": 144, "y": 0,  "u": 389, "v": 1,  "w": 50, "h": 50, "scale": 1.5, "texture": "iceandfire:textures/gui/bestiary/drawings_0.png"},
+    {"type": "ITEM",  "spread": 0, "x": 30,  "y": 20, "scale": 1.0,  "item": "iceandfire:sapphire_ore"},
+    {"type": "ITEM",  "spread": 0, "x": 40,  "y": 60, "scale": 1.0,  "item": "iceandfire:sapphire_gem"},
+    {"type": "IMAGE", "spread": 0, "x": 144, "y": 90, "u": 389, "v": 1,  "w": 50, "h": 50, "scale": 1.5, "texture": "iceandfire:textures/gui/bestiary/drawings_0.png"},
+    {"type": "ITEM",  "spread": 0, "x": 161, "y": 124, "scale": 1.0,  "item": "minecraft:oak_planks"},
+    {"type": "ITEM",  "spread": 0, "x": 161, "y": 107, "scale": 1.0,  "item": "minecraft:oak_planks"},
+    {"type": "ITEM",  "spread": 0, "x": 161, "y": 91,  "scale": 1.0,  "item": "iceandfire:manuscript"},
+    {"type": "ITEM",  "spread": 0, "x": 151, "y": 78,  "scale": 2.0,  "item": "iceandfire:lectern"}
+  ]
+}
